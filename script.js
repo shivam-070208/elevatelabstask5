@@ -15,7 +15,7 @@ const image = new Image();
     let scale=1;
     const scaledWidth = window.innerWidth;
     const scaledHeight = window.innerHeight ;
-    if(currentImage.value ==0) scale =0.8;
+    if(Math.floor(currentImage.value) ==0) scale =0.8;
     const context = canvas.getContext('2d')
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.drawImage(
@@ -47,7 +47,7 @@ gsap.to(currentImage,{
         trigger:'.main',
        
         pin:true,
-        scrub:true,
+        scrub:0.5,
         scroller:'main'
     },
     onUpdate:()=>{
