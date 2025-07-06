@@ -1,56 +1,73 @@
-const canvas = document.querySelector('canvas');
 
+  gsap.registerPlugin(ScrollTrigger);
 
-const data = Array.from({ length: 100 }, (_, i) =>
-  `CYBERFICTION-IMAGES/male${String(i ).padStart(4, '0')}.png`
-);
+  const canvas = document.querySelector("canvas");
+  const context = canvas.getContext("2d");
 
-let currentImage = { value: 0 };
-const render = () => {
-    
-const image = new Image();
-  image.src = data[Math.floor(currentImage.value)];
-  image.onload = () => {
+  const data = Array.from({ length: 100 }, (_, i) =>
+    `CYBERFICTION-IMAGES/male${String(i).padStart(4, "0")}.png`
+  );
 
-    let scale=1;
-    const scaledWidth = window.innerWidth;
-    const scaledHeight = window.innerHeight ;
-    if(Math.floor(currentImage.value) ==0) scale =0.8;
-    const context = canvas.getContext('2d')
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    context.drawImage(
-      image,
-      0,
-      0,
-      scaledWidth*scale,
-      scaledHeight
-    );
-  };
+  let currentImage = { value: 0 };
 
-  
-};
-const setCanvasSize = () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-   render()
-};
-window.addEventListener("resize", setCanvasSize);
-setCanvasSize();
+  function render() {
+    const image = new Image();
+    image.src = data[Math.floor(currentImage.value)];
+    image.onload = () => {
+      let scale = 1;
+      const scaledWidth = window.innerWidth;
+      const scaledHeight = window.innerHeight;
+      if (Math.floor(currentImage.value) == 0) scale = 0.8;
 
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.drawImage(image, 0, 0, scaledWidth * scale, scaledHeight);
+    };
+  }
 
-render()
+  function setCanvasSize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    render();
+  }
 
+  window.addEventListener("resize", setCanvasSize);
+  setCanvasSize();
 
-gsap.to(currentImage,{
-    value:data.length -1,
-    scrollTrigger:{
-        trigger:'.main',
-       
-        pin:true,
-        scrub:0.5,
-        scroller:'main'
+  const scrollContainer = document.querySelector(".main");
+  const locoScroll = new LocomotiveScroll({
+    el: scrollContainer,
+    smooth: true,
+  });
+
+  ScrollTrigger.scrollerProxy(scrollContainer, {
+    scrollTop(value) {
+      return arguments.length
+        ? locoScroll.scrollTo(value, 0, 0)
+        : locoScroll.scroll.instance.scroll.y;
     },
-    onUpdate:()=>{
-        render()
-    }
-})
+    getBoundingClientRect() {
+      return {
+        top: 0,
+        left: 0,
+        width: window.innerWidth,
+        height: window.innerHeight,
+      };
+    },
+    pinType: scrollContainer.style.transform ? "transform" : "fixed",
+  });
+
+  locoScroll.on("scroll", ScrollTrigger.update);
+  ScrollTrigger.addEventListener("refresh", () => locoScroll.update());
+  ScrollTrigger.refresh();
+
+  gsap.to(currentImage, {
+    value: data.length - 1,
+    scrollTrigger: {
+      trigger: ".main",
+      scroller: ".main",
+      pin: true,
+      scrub: 0.5,
+    },
+    onUpdate: render,
+  });
+
