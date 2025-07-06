@@ -1,9 +1,11 @@
 
-const scrollContainer = document.querySelector(".main");
+const scrollContainer = document.querySelector("main");
 
 const locoScroll = new LocomotiveScroll({
   el: scrollContainer,
   smooth: true,
+  lerp:0.0000000019
+  
 });
 
 const canvas = document.querySelector('canvas');
